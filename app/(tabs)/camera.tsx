@@ -27,11 +27,11 @@ export default function CameraScreen() {
         clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(() => {
             alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-        }, 500); // Adjust debounce time as needed
+        }, 200); // Adjust debounce time as needed
     };
 
     if (hasPermission === permissionStates.PENDING) {
-        return <Text>Requesting for camera permission</Text>;
+        return <Text>Requesting camera permission</Text>;
     }
     if (hasPermission === permissionStates.DENIED) {
         return <Text>No access to camera</Text>;
