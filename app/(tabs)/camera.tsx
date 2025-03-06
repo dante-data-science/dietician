@@ -33,8 +33,9 @@ export default function CameraScreen() {
             <CameraView
                 onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
                 barcodeScannerSettings={{
-                    barcodeTypes: ["upc_e"],
+                    barcodeTypes: ['aztec','ean13','ean8','qr','pdf417','upc_e','datamatrix','code39','code93','itf14','codabar','code128','upc_a'],
                 }}
+                autofocus={"on"}
                 style={StyleSheet.absoluteFillObject}
             />
             {scanned && (
