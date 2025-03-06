@@ -1,29 +1,39 @@
 import React, { Text, View, StyleSheet, Button, TouchableOpacity } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CameraView, Camera } from "expo-camera";
 
+const enum permissionStates {
+    PENDING,
+    DENIED,
+    GRANTED,
+}
+
 export default function CameraScreen() {
-    const [hasPermission, setHasPermission] = useState(null);
+    const [hasPermission, setHasPermission] = useState(permissionStates.PENDING);
     const [scanned, setScanned] = useState(false);
+    const debounceTimer = useRef(setTimeout(() => {}, 0));
 
     useEffect(() => {
         const getCameraPermissions = async () => {
             const { status } = await Camera.requestCameraPermissionsAsync();
-            setHasPermission(status === "granted");
+            setHasPermission(status === "granted" ? permissionStates.GRANTED : permissionStates.DENIED);
         };
 
-        getCameraPermissions();
+        getCameraPermissions().then(r => (console.log("Got permissions")));
     }, []);
 
-    const handleBarcodeScanned = ({ type, data }) => {
+    const handleBarcodeScanned = ({ type, data }: { type: string, data: string }) => {
         setScanned(true);
-        alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        clearTimeout(debounceTimer.current);
+        debounceTimer.current = setTimeout(() => {
+            alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        }, 500); // Adjust debounce time as needed
     };
 
-    if (hasPermission === null) {
+    if (hasPermission === permissionStates.PENDING) {
         return <Text>Requesting for camera permission</Text>;
     }
-    if (hasPermission === false) {
+    if (hasPermission === permissionStates.DENIED) {
         return <Text>No access to camera</Text>;
     }
 
@@ -36,6 +46,7 @@ export default function CameraScreen() {
                     barcodeTypes: ['aztec','ean13','ean8','qr','pdf417','upc_e','datamatrix','code39','code93','itf14','codabar','code128','upc_a'],
                 }}
                 autofocus={"on"}
+                videoQuality={"2160p"}
                 style={StyleSheet.absoluteFillObject}
             />
             {scanned && (
