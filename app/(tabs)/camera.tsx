@@ -1,6 +1,6 @@
-import React, { Text, View, StyleSheet, Button, TouchableOpacity } from 'react-native';
-import { useState, useEffect, useRef } from 'react';
-import { CameraView, Camera } from "expo-camera";
+import React, {Text, View, StyleSheet, Button, TouchableOpacity} from 'react-native';
+import {useState, useEffect, useRef} from 'react';
+import {CameraView, Camera} from "expo-camera";
 
 const enum permissionStates {
     PENDING,
@@ -11,18 +11,19 @@ const enum permissionStates {
 export default function CameraScreen() {
     const [hasPermission, setHasPermission] = useState(permissionStates.PENDING);
     const [scanned, setScanned] = useState(false);
-    const debounceTimer = useRef(setTimeout(() => {}, 0));
+    const debounceTimer = useRef(setTimeout(() => {
+    }, 0));
 
     useEffect(() => {
         const getCameraPermissions = async () => {
-            const { status } = await Camera.requestCameraPermissionsAsync();
+            const {status} = await Camera.requestCameraPermissionsAsync();
             setHasPermission(status === "granted" ? permissionStates.GRANTED : permissionStates.DENIED);
         };
 
         getCameraPermissions().then(r => (console.log("Got permissions")));
     }, []);
 
-    const handleBarcodeScanned = ({ type, data }: { type: string, data: string }) => {
+    const handleBarcodeScanned = ({type, data}: { type: string, data: string }) => {
         setScanned(true);
         clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(() => {
@@ -43,14 +44,14 @@ export default function CameraScreen() {
             <CameraView
                 onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
                 barcodeScannerSettings={{
-                    barcodeTypes: ['aztec','ean13','ean8','qr','pdf417','upc_e','datamatrix','code39','code93','itf14','codabar','code128','upc_a'],
+                    barcodeTypes: ['aztec', 'ean13', 'ean8', 'qr', 'pdf417', 'upc_e', 'datamatrix', 'code39', 'code93', 'itf14', 'codabar', 'code128', 'upc_a'],
                 }}
                 autofocus={"on"}
                 videoQuality={"2160p"}
                 style={StyleSheet.absoluteFillObject}
             />
             {scanned && (
-                <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
+                <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)}/>
             )}
         </View>
     );
