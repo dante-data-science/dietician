@@ -37,7 +37,6 @@
     "expo-system-ui": "~4.0.8",
     "expo-video": "^2.0.5",
     "expo-web-browser": "~14.0.2",
-    "quagga": "^0.12.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.7",
