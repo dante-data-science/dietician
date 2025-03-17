@@ -1,6 +1,7 @@
 import React, {Text, View, StyleSheet, Button, TouchableOpacity} from 'react-native';
 import {useState, useEffect, useRef} from 'react';
 import {CameraView, Camera} from "expo-camera";
+import axios from 'axios';
 
 const enum permissionStates {
     PENDING,
@@ -27,8 +28,41 @@ export default function CameraScreen() {
         setScanned(true);
         clearTimeout(debounceTimer.current);
         debounceTimer.current = setTimeout(() => {
-            alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-        }, 200); // Adjust debounce time as needed
+            axios.get(`https://world.openfoodfacts.org/product/${data}`).then((response) => {
+                const html: string = response.data;
+                const negScoreMatch = html.match(/<h3 class="panel_title_ evaluation_bad_title">Negative points: (.*?)<\/h3>/m);
+                if (negScoreMatch == null || negScoreMatch.length !== 2) {
+                    alert(`Product ingredients not found for ${data}`)
+                    console.log(negScoreMatch);
+                    return;
+                }
+                const negScore = parseInt(negScoreMatch[1].split('/')[0], 10) / parseInt(negScoreMatch[1].split('/')[1], 10);
+                alert(`Food has a score of ${Math.round((1 - negScore) * 10000) / 100}%`);
+            });
+            axios.get(`https://barcodelookup.com/${data}`).then((response) => {
+                const html: string = response.data;
+                const ingredientsTag = html.match(/<!-- Ingredients -->[\s\S]*?<span class=\\??"product-text\\??">\s*(.*?)\.? ?\n/m);
+                if (ingredientsTag == null || ingredientsTag.length !== 2) {
+                    alert(`Product ingredients not found for ${data}`)
+                    console.log(ingredientsTag);
+                    return;
+                }
+                let ingredients = ingredientsTag[1].split(", ");
+                for (let i = 0; i < ingredients.length; i++) {
+                    if (ingredients[i].indexOf('(') !== -1) {
+                        ingredients[i] = ingredients[i].split("(")[1];
+                    }
+                    if (ingredients[i].indexOf(')') !== -1) {
+                        ingredients[i] = ingredients[i].split(")")[0];
+                    }
+                    ingredients[i] = ingredients[i].toLowerCase()
+                }
+                ingredients = ingredients.filter((ingredient, index) => {
+                    return ingredients.indexOf(ingredient) === index;
+                })
+                alert(`Found ingredients: ${ingredients}`);
+            })
+        }, 100); // Adjust debounce time as needed
     };
 
     if (hasPermission === permissionStates.PENDING) {
