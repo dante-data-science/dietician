@@ -4,10 +4,8 @@ import {Image} from 'expo-image';
 export default function Index() {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Welcome to Dietitian</Text>
-            <View style={styles.imageContainer}>
-                <Image style={styles.image} source={require('../../assets/images/react-logo.png')}/>
-            </View>
+            <Text style={styles.title}>Welcome to Dietitian</Text>
+            <Image style={styles.image} source={require('../../assets/images/icon.png')}/>
         </View>
     );
 }
@@ -19,20 +17,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    text: {
+    title: {
         color: 'white',
-    },
-    button: {
-        fontSize: 20,
-        textDecorationLine: 'underline',
-        color: '#fff',
-    },
-    imageContainer: {
-        flex: 1,
+        fontSize: 30,
     },
     image: {
-        width: 320,
-        height: 440,
+        width: 200,
+        height: 200,
         borderRadius: 18,
     },
 })
